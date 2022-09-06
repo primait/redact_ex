@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  web:
+    build: .
+    container_name: redact_ex_web
+    init: true
+    ports:
+      - "4000:4000"
+    volumes:
+      - app:/home/app
+      - "~/.ssh:/home/app/.ssh"
+      - "~/.gitconfig:/home/app/.gitconfig"
+      - "~/.gitignore:/home/app/.gitignore"
+      - .:/app
+    working_dir: /app
+    environment:
+      APP_NAME: redact_ex
+      VERSION: 0.0.0-dev
+      MIX_BUILD_ROOT: /home/app/_build
+      MIX_DEPS_PATH: /home/app/deps
+    depends_on:
+      - jaeger
+      - postgres
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.35
+    ports:
+      - 16686:16686
+      - 55681:55681
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      COLLECTOR_OTLP_HTTP_HOST_PORT: 55681
+
+  postgres:
+    image: public.ecr.aws/bitnami/postgresql:12
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+volumes:
+  app:

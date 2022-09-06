@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+source /setup_common.sh
+
+if [ "$1" == "mix" ]; then
+    exec "$@"
+elif [ -n "$1" ]; then
+    sh -c "$@"
+else
+    mix deps.get
+    printf "Checking postgres connection "
+    while ! pg_isready --host=postgres --port=5432 --quiet; do
+        sleep 1
+        printf "."
+    done
+    printf "\n"
+    mix ecto.reset
+    mix phx.server
+fi
