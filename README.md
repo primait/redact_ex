@@ -24,10 +24,16 @@ You may want to opt-out from fallbacking to a default implementation by configur
 config :redact_ex, :fallback_to_any, false
 ```
 
-## Open points
+## Usage
+
+See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings
+See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving redactable structs
+
+## TODO
+
+   [ ] Switch to enable/disable masking per environment
+
+## Open Points
 
    * Other ways of masking (e.g. first X letters and last Y exposed)
-   * Make slightly faster the fallback slow version
-   * Switch to enable/disable masking per environment?
-   * Fallback masker atm is forced to :simple
    * maybe-email masker (with fallback)?

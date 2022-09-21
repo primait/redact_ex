@@ -14,7 +14,24 @@ defmodule RedactEx.MixProject do
         plt_add_apps: [:mix, :ex_unit],
         list_unused_filters: true
       ],
-      consolidate_protocols: Mix.env() != :test
+      consolidate_protocols: Mix.env() != :test,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      # Docs
+      name: "RedactEx",
+      source_url: "https://github.com/primait/redact_ex",
+      homepage_url: "https://github.com/primait/redact_ex",
+      docs: [
+        # The main page in the docs
+        main: "RedactEx",
+        # logo: "path/to/logo.png",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -32,7 +49,9 @@ defmodule RedactEx.MixProject do
   defp dev_deps do
     [
       {:credo, "~> 1.6", only: [:dev, :test]},
-      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.10", only: :test},
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false}
     ]
   end
 

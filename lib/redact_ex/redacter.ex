@@ -44,35 +44,36 @@ defmodule RedactEx.Redacter do
   ## Configuration
 
   Options:
-   `rules`    a list of redacting rules. Each element can be:
-                - a tuple in the form {expected_string_length, configuration}
-                - a tuple in the form {expected_string_min_length..expected_string_max_length, configuration}
-                - a tuple in the form {:*, configuration}
-                - a single expected_string_length
-
-  ### Redacter configuration for :*
-
-  Note that in this case the generic `:redact` alias will *not* be generated, and an error will be raised if you try to use it.
-  This is because for each configured length a default (slower) fallback will always be generated.
+   `redacters`  a list of redacting rules. Each element can be:
+                - a tuple in the form {redacter_function_name, configuration}
+                - a tuple in the form {[redacter_function_names], configuration}
+                - a single redacter_function_name
+                `redacter_function_name` can be an atom or string value in all cases
 
   ### Common configuration
 
   Configuration of a redacter is a keyword list containing
 
-    * `aliases`         list(atom | string)     list of aliases that will be created for the redacter
-    * `redacter`        string                  character used to redact the hidden part of the. Defaults to `#{@default_redacter}`
-    * `redacted_size`   integer | :auto         length of the resulting string that will be set as redacted. Defaults to `#{@default_redacted_size}`,
-                                                which will set it to `expected_string_length - keep`
-    * `algorithm`       atom                    algorithm used to redact the string. Defaults to `#{@default_redacting_algorithm}`
-    * `except_env`      list(atom)              environments for which redacters functions will NOT be generated
-    * `keep`            integer                 quote of the string that will be kept. Defaults to `#{@default_redacting_keep}%`
+    * `redacter`        string                              character used to redact the hidden part of the. Defaults to `#{@default_redacter}`
+    * `redacted_size`   integer | :auto                     length of the resulting string that will be set as redacted. Defaults to `#{@default_redacted_size}`,
+                                                            which will set it to `expected_string_length - keep`
+    * `algorithm`       atom | module                       algorithm used to redact the string. Defaults to `#{@default_redacting_algorithm}`
+                                                            if a module is given, it must implement the [RedactEx.Algorithms.Algorithm](./lib/algorithms/algorithm.ex) behaviour
+                                                            Supported atoms are
+                                                            - `:simple` (alias for `RedactEx.Algorithms.Simple`)
+                                                            - `:center` (alias for `RedactEx.Algorithms.Center`)
+    * `except_env`      list(atom)                          environments for which redacters functions will NOT be generated
+    * `keep`            integer                             quote of the string that will be kept. Defaults to `#{@default_redacting_keep}%`
+    * `length`          integer or  `:*`                    length of the string to be considered. `:*` stands for the fallback function configuration. Is overridden by key `:lengths` if present
+    * `lengths`         [integer or `:*`] | min..max        lengths of the strings to be considered. `:*` stands for the fallback function configuration. A function for each specific length will be generated
 
   ## Example
 
       iex> defmodule MyApp.Redacting do
               @moduledoc false
               use RedactEx.Redacter, redacters: [
-                {redact_three, length: 3}
+                {"redact_three", length: 3, algorithm: :simple},
+                {"redact", lengths: 1..3, algorithm: :simple},
               ]
            end
 

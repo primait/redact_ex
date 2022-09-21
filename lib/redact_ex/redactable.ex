@@ -14,6 +14,9 @@ defprotocol RedactEx.Redactable do
   ])
   defstruct [:myfield1, :myfield2]
   ```
+
+  Good practices could be to implement the Inspect protocol for sensitive data and use the derived `redact`
+  capabilities of the inspected module inside its implementation.
   """
 
   @fallback_to_any Application.compile_env(:redact_ex, :fallback_to_any, true)
