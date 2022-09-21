@@ -1,6 +1,6 @@
 defmodule RedactEx.Redacter do
   @default_redacting_keep 25
-  @default_redacting_length :auto
+  @default_redacted_size :auto
   @default_redacter "*"
 
   @default_redacting_algorithm RedactEx.Algorithms.algorithm_simple()
@@ -61,7 +61,7 @@ defmodule RedactEx.Redacter do
 
     * `aliases`         list(atom | string)     list of aliases that will be created for the redacter
     * `redacter`        string                  character used to redact the hidden part of the. Defaults to `#{@default_redacter}`
-    * `redacted_size`   integer | :auto         length of the resulting string that will be set as redacted. Defaults to `#{@default_redacting_length}`,
+    * `redacted_size`   integer | :auto         length of the resulting string that will be set as redacted. Defaults to `#{@default_redacted_size}`,
                                                 which will set it to `expected_string_length - keep`
     * `algorithm`       atom                    algorithm used to redact the string. Defaults to `#{@default_redacting_algorithm}`
     * `except_env`      list(atom)              environments for which redacters functions will NOT be generated
@@ -71,7 +71,9 @@ defmodule RedactEx.Redacter do
 
       iex> defmodule MyApp.Redacting do
               @moduledoc false
-              use RedactEx.Redacter, redacters: [1, 2, {3, aliases: [:redact_three]}]
+              use RedactEx.Redacter, redacters: [
+                {redact_three, length: 3}
+              ]
            end
 
       This will expose the following functions:
@@ -104,23 +106,11 @@ defmodule RedactEx.Redacter do
 
       fun_ast =
         for %Context{algorithm: algorithm} = redacter_configuration <-
-              alias_redacters |> IO.inspect() do
+              alias_redacters do
           Algorithms.generate_ast(algorithm, redacter_configuration)
         end
 
-      # Create fallback rule for current alias
-      fallback_ast =
-        if needs_fallback_function do
-          quote do
-            def unquote(alias_name)(value),
-              do: algorithm.fallback_redact(value)
-          end
-        else
-          quote do
-          end
-        end
-
-      List.flatten([doc_ast, function_spec_ast, fun_ast, fallback_ast])
+      List.flatten([doc_ast, function_spec_ast, fun_ast])
     end
   end
 end

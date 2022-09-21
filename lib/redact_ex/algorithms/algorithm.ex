@@ -13,12 +13,6 @@ defmodule RedactEx.Algorithms.Algorithm do
   @callback generate_ast(configuration :: any()) :: Macro.t()
 
   @doc """
-  Returns the implementation of a catch-all function, for the cases where
-  input escapes any other guard
-  """
-  @callback generate_fallback_ast(configuration :: any()) :: Macro.t()
-
-  @doc """
   Parses additional configuration at compile time for given algorithm.
   Configuration will be kept in Context's `extra` field
   Shall return any configuration (eventually) readable by `generate_ast` and `generate_fallback_ast`

@@ -4,16 +4,25 @@ defmodule RedactEx.Configuration do
   """
 
   @default_redacting_keep 25
-  @default_redacting_length :auto
+  @default_redacted_size :auto
   @default_redacter "*"
   @default_redacting_algorithm RedactEx.Algorithms.algorithm_simple()
-  @catchall_function_name :redact
+  @default_lengths [:*]
+
+  @default_configuration [
+    keep: @default_redacting_keep,
+    redacted_size: @default_redacted_size,
+    redacter: @default_redacter,
+    algorithm: @default_redacting_algorithm,
+    lengths: @default_lengths
+  ]
 
   alias RedactEx.Algorithms
   alias RedactEx.Configuration.Context
 
   @doc """
-  Return configurations ordered by name, so we can generate matching and catchall in a good order
+  Return configurations grouped by name, so we can generate matching and catchall in a good order
+  when needed
   """
   @spec parse(list()) :: %{atom() => list(map())}
   def parse(configuration) when is_list(configuration),
@@ -22,37 +31,38 @@ defmodule RedactEx.Configuration do
       |> Keyword.fetch!(:redacters)
       |> Enum.flat_map(&parse_redacter/1)
       |> Enum.group_by(fn %{name: name} = _config -> name end)
+      |> Enum.map(&add_fallback_redacter!(&1))
+      |> Enum.into(%{})
 
-  # Catch-all special case
-  defp parse_redacter({:*, config}),
-    do: do_parse_redacter(:*, check_catchall_aliases(config))
+  defp parse_redacter({aliases, config}) when is_list(aliases),
+    do: Enum.flat_map(aliases, &map_lengths_and_parse(&1, config))
 
-  # Single integer case: all defaults apply
-  defp parse_redacter(string_length) when is_integer(string_length),
-    do: parse_redacter({string_length, []})
+  # Single name: all defaults apply
+  # Name will be normalized later
+  defp parse_redacter(name) when is_atom(name) or is_binary(name),
+    do: map_lengths_and_parse(name, @default_configuration)
 
-  #  Range case: for each string length a full set of functions will be generated
-  defp parse_redacter({_min.._max = range, config}),
-    do: Enum.flat_map(range, fn string_length -> do_parse_redacter(string_length, config) end)
+  defp parse_redacter({name, config}), do: map_lengths_and_parse(name, config)
 
-  defp parse_redacter({string_length, config}), do: do_parse_redacter(string_length, config)
+  defp map_lengths_and_parse(name, config) do
+    config
+    |> get_length_from_config(name)
+    |> Enum.map(&do_parse_redacter(&1, name, config))
+  end
 
-  defp do_parse_redacter(string_length, config)
+  defp do_parse_redacter(string_length, given_name, given_config)
        when is_integer(string_length) or string_length == :* do
-    keep = Keyword.get(config, :keep, @default_redacting_keep)
-    redacted_size = Keyword.get(config, :redacted_size, @default_redacting_length)
+    config = Keyword.merge(@default_configuration, given_config)
+
+    keep = Keyword.fetch!(config, :keep)
+    redacted_size = Keyword.fetch!(config, :redacted_size)
     needs_fallback_function = needs_fallback_function?(string_length)
 
-    algorithm =
-      config |> Keyword.get(:algorithm, @default_redacting_algorithm) |> validate_algorithm()
+    algorithm = config |> Keyword.fetch!(:algorithm) |> validate_algorithm()
 
-    aliases =
-      config
-      |> Keyword.get(:aliases, [])
-      |> aliases_names()
-      |> check_has_redact_function(string_length)
+    name = alias_name(given_name)
 
-    redacter = Keyword.get(config, :redacter, @default_redacter)
+    redacter = Keyword.fetch!(config, :redacter)
 
     {plaintext_length, redacted_length} =
       Context.get_plaintext_length_redacted_length(string_length, keep, redacted_size)
@@ -61,34 +71,23 @@ defmodule RedactEx.Configuration do
 
     extra = algorithm.parse_extra_configuration!(config)
 
-    for name <- aliases,
-        do: %Context{
-          redacter: redacter,
-          keep: keep,
-          plaintext_length: plaintext_length,
-          redacted_length: redacted_length,
-          name: name,
-          redacted_part: redacted,
-          string_length: string_length,
-          algorithm: algorithm,
-          needs_fallback_function: needs_fallback_function,
-          extra: extra
-        }
+    %Context{
+      redacted_size: redacted_size,
+      length: string_length,
+      redacter: redacter,
+      keep: keep,
+      plaintext_length: plaintext_length,
+      redacted_length: redacted_length,
+      name: name,
+      redacted_part: redacted,
+      string_length: string_length,
+      algorithm: algorithm,
+      needs_fallback_function: needs_fallback_function,
+      extra: extra
+    }
   end
 
-  # Check the catchall :* configuration does NOT contain the generic catchall generated
-  # for normal redacters
-  defp check_catchall_aliases(config) do
-    if config |> Keyword.get(:aliases, []) |> Enum.member?(@catchall_function_name) do
-      raise "Catch-all configuration can NOT include [#{@catchall_function_name}] as an alias, since it is the fallback function name. Please remove it and provide at least one different alias"
-    end
-
-    config
-  end
-
-  # Transform aliases to complete names
-  defp aliases_names(aliases), do: Enum.map(aliases, &alias_name/1)
-
+  # Normalize function names to atom
   defp alias_name(name) when is_binary(name), do: String.to_atom("#{name}")
   defp alias_name(name) when is_atom(name), do: alias_name(to_string(name))
 
@@ -101,21 +100,41 @@ defmodule RedactEx.Configuration do
   defp validate_algorithm(algorithm),
     do: Algorithms.valid_algorithm?(algorithm)
 
-  # Check that redacting function aliases are configured when needed
-  defp check_has_redact_function([] = _aliases, :*),
-    do:
-      raise(
-        "Aliases cannot be empty for generic redacters (:*). Please provide at least one alias"
-      )
+  defp get_length_from_config(config, name) do
+    case Keyword.get(config, :lengths, :undefined) do
+      :undefined ->
+        case Keyword.get(config, :length, :undefined) do
+          :undefined -> [:*]
+          num when is_integer(num) or num == :* -> [num]
+          other -> raise "invalid `:length` value [#{inspect(other)}] configured for [#{name}]"
+        end
 
-  defp check_has_redact_function(aliases, :*) do
-    if Enum.member?(aliases, "#{@catchall_function_name}") do
-      raise "Generic redacters cannot have the alias `mask`. Please remove it and provide at least one different alias"
-    else
-      aliases
+      [] ->
+        raise "`:lengths` cannot be empty. Please configure `:lengths` or `:length` keyword in configuration for [#{name}]"
+
+      lengths when is_list(lengths) ->
+        lengths
+
+      # range case
+      {:.., [line: _], [min, max]} ->
+        Enum.map(min..max, & &1)
+
+      other ->
+        raise "invalid `:lengths` value [#{inspect(other)}] configured for [#{name}]"
     end
   end
 
-  defp check_has_redact_function(aliases, _string_length),
-    do: Enum.concat(aliases, [@catchall_function_name])
+  defp add_fallback_redacter!({key, contexts}) do
+    case Enum.split_with(contexts, fn %Context{length: len} -> len != :* end) do
+      {non_fallback_contexts, []} ->
+        {key,
+         Enum.concat(non_fallback_contexts, [do_parse_redacter(:*, key, @default_configuration)])}
+
+      {non_fallback_contexts, [fallback_context]} ->
+        {key, Enum.concat(non_fallback_contexts, [fallback_context])}
+
+      {_, [_h | _t]} ->
+        raise "More than one fallback configurations found for [#{key}]"
+    end
+  end
 end

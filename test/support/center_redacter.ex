@@ -1,9 +1,9 @@
-defmodule Support.Compliance.CenterTestMasker do
+defmodule Support.RedactEx.CenterTestRedacter do
   @moduledoc false
 
   use RedactEx.Redacter,
     redacters: [
-      {10, aliases: [:center_ten], algorithm: :center},
-      {:*, aliases: [:center_unknown], algorithm: :center}
+      {:center_ten, length: 10, algorithm: :center},
+      {:center_unknown, length: :*, algorithm: :center}
     ]
 end

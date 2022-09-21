@@ -5,15 +5,41 @@ defmodule RedactEx.Algorithms.Simple do
   """
   @behaviour RedactEx.Algorithms.Algorithm
 
-  RedactEx.Algorithms.Algorithm
+  alias RedactEx.Configuration.Context
 
   @impl RedactEx.Algorithms.Algorithm
-  def generate_ast(%{
-        plaintext_length: nil,
-        redacted_length: nil,
-        name: name
+  def generate_ast(%Context{
+        length: :*,
+        keep: keep,
+        name: name,
+        redacter: redacter,
+        redacted_size: redacted_size
       }) do
-    raise "Could not create `#{name}`. `#{__MODULE__}` algorithm for unknown length strings has not been implemented yet"
+    quote do
+      def unquote(name)(value) when is_binary(value) do
+        string_length = String.length(value)
+        plaintext_length = floor(string_length * unquote(keep) / 100)
+
+        {plaintext_length, redacted_length} =
+          Context.get_plaintext_length_redacted_length(
+            string_length,
+            unquote(keep),
+            unquote(redacted_size)
+          )
+
+        redacted = Context.get_redacter_string(redacted_length, unquote(redacter))
+
+        case max(0, plaintext_length - 1) do
+          0 ->
+            redacted
+
+          n ->
+            String.slice(value, 0..n) <> redacted
+        end
+      end
+
+      def unquote(name)(_value), do: "(fully redacted as not a string)"
+    end
   end
 
   def generate_ast(%{
@@ -47,10 +73,6 @@ defmodule RedactEx.Algorithms.Simple do
         do: unquote(redacted)
     end
   end
-
-  @impl RedactEx.Algorithms.Algorithm
-  @spec generate_fallback_ast(any()) :: String.t()
-  def generate_fallback_ast(_), do: "*"
 
   @impl RedactEx.Algorithms.Algorithm
   @spec parse_extra_configuration!(any()) :: %{}

@@ -5,9 +5,11 @@ defmodule RedactEx.Configuration.Context do
 
   alias __MODULE__
 
-  defstruct redacter: nil,
+  defstruct length: :*,
+            redacter: nil,
             keep: nil,
             plaintext_length: nil,
+            redacted_size: nil,
             redacted_length: nil,
             name: nil,
             redacted_part: nil,
@@ -25,7 +27,7 @@ defmodule RedactEx.Configuration.Context do
   @spec get_plaintext_length_redacted_length(
           string_length :: :* | integer(),
           keep :: integer(),
-          redacted_size :: integer()
+          redacted_size :: integer() | :auto
         ) :: {nil, nil} | {integer(), integer()}
   def get_plaintext_length_redacted_length(:*, _keep, _redacted_size), do: {nil, nil}
 

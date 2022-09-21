@@ -56,10 +56,6 @@ defmodule RedactEx.Algorithms.Center do
   end
 
   @impl RedactEx.Algorithms.Algorithm
-  @spec generate_fallback_ast(any()) :: String.t()
-  def generate_fallback_ast(_), do: "*"
-
-  @impl RedactEx.Algorithms.Algorithm
   @spec parse_extra_configuration!(any()) :: %{}
   def parse_extra_configuration!(_), do: %{}
 

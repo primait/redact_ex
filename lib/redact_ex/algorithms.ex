@@ -17,15 +17,15 @@ defmodule RedactEx.Algorithms do
   def base_algorithms, do: @algorithms
 
   @doc """
-  Validate an algorithm at configuration level.
-  An algorithm is
+  Validate an algorithm at configuration level
   """
   @spec valid_algorithm?(algorithm :: atom() | module()) :: :ok | no_return()
   def valid_algorithm?(algorithm) when algorithm in @algorithms, do: map_base_algorithm(algorithm)
 
   def valid_algorithm?(algorithm_module) when is_atom(algorithm_module) do
-    with {:ensure, {:ok, module}} <- {:ensure, Code.ensure_loaded(algorithm_module)},
-         {:implements, true} <- RedactEx.Algorithms.Algorithm.implemented_by?(module) do
+    with {:ensure, {:module, module}} <- {:ensure, Code.ensure_loaded(algorithm_module)},
+         {:implements, true} <-
+           {:implements, RedactEx.Algorithms.Algorithm.implemented_by?(module)} do
       module
     else
       {:ensure, error} ->

@@ -3,8 +3,6 @@ defmodule Support.RedactEx.BaseTestRedacter do
 
   use RedactEx.Redacter,
     redacters: [
-      {1, aliases: [:one, "string_one"]},
-      5,
-      {8, aliases: [:eight]}
+      {[:base, "string_base"], lengths: [1, 5, 8]}
     ]
 end
