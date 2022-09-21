@@ -13,7 +13,8 @@ defmodule RedactEx.MixProject do
       dialyzer: [
         plt_add_apps: [:mix, :ex_unit],
         list_unused_filters: true
-      ]
+      ],
+      consolidate_protocols: Mix.env() != :test
     ]
   end
 
