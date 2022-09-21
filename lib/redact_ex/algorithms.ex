@@ -25,7 +25,7 @@ defmodule RedactEx.Algorithms do
   def valid_algorithm?(algorithm_module) when is_atom(algorithm_module) do
     with {:ensure, {:module, module}} <- {:ensure, Code.ensure_loaded(algorithm_module)},
          {:implements, true} <-
-           {:implements, RedactEx.Algorithms.Algorithm.implemented_by?(module)} do
+           {:implements, Algorithm.implemented_by?(module)} do
       module
     else
       {:ensure, error} ->

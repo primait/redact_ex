@@ -88,7 +88,6 @@ defmodule RedactEx.Redacter do
 
     for {alias_name, alias_redacters} <- redacters do
       lengths = Enum.map(alias_redacters, fn %{string_length: string_length} -> string_length end)
-      needs_fallback_function = Enum.at(alias_redacters, 0).needs_fallback_function
 
       doc_ast =
         quote do

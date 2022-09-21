@@ -46,7 +46,7 @@ defmodule RedactEx.Configuration do
 
   defp map_lengths_and_parse(name, config) do
     config
-    |> get_length_from_config(name)
+    |> get_lengths_from_config(name)
     |> Enum.map(&do_parse_redacter(&1, name, config))
   end
 
@@ -101,13 +101,17 @@ defmodule RedactEx.Configuration do
     do: Algorithms.valid_algorithm?(algorithm)
 
   defp get_length_from_config(config, name) do
+    case Keyword.get(config, :length, :undefined) do
+      :undefined -> [:*]
+      num when is_integer(num) or num == :* -> [num]
+      other -> raise "invalid `:length` value [#{inspect(other)}] configured for [#{name}]"
+    end
+  end
+
+  defp get_lengths_from_config(config, name) do
     case Keyword.get(config, :lengths, :undefined) do
       :undefined ->
-        case Keyword.get(config, :length, :undefined) do
-          :undefined -> [:*]
-          num when is_integer(num) or num == :* -> [num]
-          other -> raise "invalid `:length` value [#{inspect(other)}] configured for [#{name}]"
-        end
+        get_length_from_config(config, name)
 
       [] ->
         raise "`:lengths` cannot be empty. Please configure `:lengths` or `:length` keyword in configuration for [#{name}]"

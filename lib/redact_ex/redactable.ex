@@ -3,7 +3,7 @@ defprotocol RedactEx.Redactable do
   Protocol for defining a redact-able item, e.g. an item whose internal elements could be masked
   It shall return a redact-ed item of the same type as the input item
   """
-  @fallback_to_any Application.get_env(:redact_ex, :fallback_to_any, true)
+  @fallback_to_any Application.compile_env(:redact_ex, :fallback_to_any, true)
 
   @type container :: struct() | map()
   @type binary_container :: String.t() | binary()

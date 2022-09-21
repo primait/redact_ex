@@ -18,7 +18,6 @@ defmodule RedactEx.Algorithms.Simple do
     quote do
       def unquote(name)(value) when is_binary(value) do
         string_length = String.length(value)
-        plaintext_length = floor(string_length * unquote(keep) / 100)
 
         {plaintext_length, redacted_length} =
           Context.get_plaintext_length_redacted_length(
