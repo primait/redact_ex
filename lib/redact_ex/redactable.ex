@@ -7,10 +7,9 @@ defprotocol RedactEx.Redactable do
 
   ```
   @derive RedactEx.Redactable(
-    using: my_module,
-    only: [
-      myfield1: :redact_function_one,
-      myfield2: :redact_function_two
+    fields: [
+      myfield1: {MyModule, :redact_function_one},
+      myfield2: {MyModule, :redact_function_two}
   ])
   defstruct [:myfield1, :myfield2]
   ```
