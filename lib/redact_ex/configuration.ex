@@ -26,7 +26,7 @@ defmodule RedactEx.Configuration do
   Return configurations grouped by name, so we can generate matching and catchall in a good order
   when needed
   """
-  @spec parse(configuration :: list(), current_env :: atom(), macro_env :: Macro.t()) :: %{
+  @spec parse(configuration :: list(), current_env :: atom(), macro_env :: map()) :: %{
           atom() => list(map())
         }
   def parse(configuration, current_env, macro_env) when is_list(configuration),
