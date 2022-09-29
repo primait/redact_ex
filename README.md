@@ -14,16 +14,6 @@ to  your understanding of the system, and at the same moment it does not expose 
 
 ## Configuration
 
-### fallback_to_any
-
-You may want to opt-out from fallbacking to a default implementation by configuring
-
-``` elixir
-# config.exs
-
-config :redact_ex, :fallback_to_any, false
-```
-
 ## Usage
 
 See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings

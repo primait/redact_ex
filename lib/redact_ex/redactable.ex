@@ -18,7 +18,7 @@ defprotocol RedactEx.Redactable do
   capabilities of the inspected module inside its implementation.
   """
 
-  @fallback_to_any Application.compile_env(:redact_ex, :fallback_to_any, true)
+  @fallback_to_any true
 
   @type container :: struct() | map()
   @type binary_container :: String.t() | binary()
