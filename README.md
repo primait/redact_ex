@@ -19,9 +19,21 @@ to  your understanding of the system, and at the same moment it does not expose 
 See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings
 See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving redactable structs
 
+## Contributing
+
+The recommended way to work is to use [asdf](https://github.com/asdf-vm/asdf) language runtime versions manager.
+
+You will find a [.tool-versions.recommended](./tool-versions.recommended) file that - hopefully - is up to date with the versions used in CI.
+
+Please be sure that your test pass with those versions before pushing to save yourself the wait for automatic checks.
+
+``` bash
+# Use project's defaults
+cp .tool-versions.recommended .tool-versions
+```
+
 ## TODO
 
-- [ ] Switch to enable/disable masking per environment
 - [ ] Expand explanation of fallback custom implementations of algorithms
 - [ ] fix dialyzer :(
 

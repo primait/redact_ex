@@ -27,3 +27,7 @@ throwaway-*.tar
 
 # if you use Elixir LS
 /.elixir_ls/
+
+# Use your own Elixir/Erlang versions, just know that CI will
+# run over .tool-versions.recommended versions
+.tool-versions
