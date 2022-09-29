@@ -62,10 +62,10 @@ defmodule RedactEx.Redacter do
                                                             Supported atoms are
                                                             - `:simple` (alias for `RedactEx.Algorithms.Simple`)
                                                             - `:center` (alias for `RedactEx.Algorithms.Center`)
-    * `except_env`      list(atom)                          environments for which redacters functions will NOT be generated
     * `keep`            integer                             quote of the string that will be kept. Defaults to `#{@default_redacting_keep}%`
     * `length`          integer or  `:*`                    length of the string to be considered. `:*` stands for the fallback function configuration. Is overridden by key `:lengths` if present
     * `lengths`         [integer or `:*`] | min..max        lengths of the strings to be considered. `:*` stands for the fallback function configuration. A function for each specific length will be generated
+    * `except`          list(atom())                        list of environments for which this configuration will have effect
 
   ## Example
 
@@ -87,7 +87,7 @@ defmodule RedactEx.Redacter do
 
   @spec __using__(opts :: list()) :: any()
   defmacro __using__(opts) do
-    redacters = Configuration.parse(opts)
+    redacters = Configuration.parse(opts, Mix.env())
 
     for {alias_name, alias_redacters} <- redacters do
       lengths = Enum.map(alias_redacters, fn %{string_length: string_length} -> string_length end)

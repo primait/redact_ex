@@ -8,13 +8,15 @@ defmodule RedactEx.Configuration do
   @default_redacter "*"
   @default_redacting_algorithm RedactEx.Algorithms.algorithm_simple()
   @default_lengths [:*]
+  @default_except []
 
   @default_configuration [
     keep: @default_redacting_keep,
     redacted_size: @default_redacted_size,
     redacter: @default_redacter,
     algorithm: @default_redacting_algorithm,
-    lengths: @default_lengths
+    lengths: @default_lengths,
+    except: @default_except
   ]
 
   alias RedactEx.Algorithms
@@ -24,15 +26,22 @@ defmodule RedactEx.Configuration do
   Return configurations grouped by name, so we can generate matching and catchall in a good order
   when needed
   """
-  @spec parse(list()) :: %{atom() => list(map())}
-  def parse(configuration) when is_list(configuration),
+  @spec parse(configuration :: list(), current_env :: atom()) :: %{atom() => list(map())}
+  def parse(configuration, current_env) when is_list(configuration),
     do:
       configuration
       |> Keyword.fetch!(:redacters)
       |> Enum.flat_map(&parse_redacter/1)
+      |> reject_by_env(current_env)
       |> Enum.group_by(fn %{name: name} = _config -> name end)
       |> Enum.map(&add_fallback_redacter!(&1))
       |> Enum.into(%{})
+
+  defp reject_by_env(redacters, current_env),
+    do:
+      Enum.reject(redacters, fn %Context{except: refute_envs} ->
+        current_env in refute_envs
+      end)
 
   defp parse_redacter({aliases, config}) when is_list(aliases),
     do: Enum.flat_map(aliases, &map_lengths_and_parse(&1, config))
@@ -54,6 +63,7 @@ defmodule RedactEx.Configuration do
        when is_integer(string_length) or string_length == :* do
     config = Keyword.merge(@default_configuration, given_config)
 
+    except = Keyword.fetch!(config, :except)
     keep = Keyword.fetch!(config, :keep)
     redacted_size = Keyword.fetch!(config, :redacted_size)
     needs_fallback_function = needs_fallback_function?(string_length)
@@ -83,7 +93,8 @@ defmodule RedactEx.Configuration do
       string_length: string_length,
       algorithm: algorithm,
       needs_fallback_function: needs_fallback_function,
-      extra: extra
+      extra: extra,
+      except: except
     }
   end
 

@@ -16,7 +16,8 @@ defmodule RedactEx.Configuration.Context do
             string_length: nil,
             algorithm: nil,
             needs_fallback_function: nil,
-            extra: nil
+            extra: nil,
+            except: []
 
   @type t :: %Context{}
 
