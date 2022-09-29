@@ -26,7 +26,7 @@ defmodule RedactEx.Redacter do
       iex> String.length(string)
       5
       iex> byte_size(string)
-      6
+      7
 
   So you may consider it when evaluating for which kind of data you're planning to use byte-based helpers
 
@@ -70,12 +70,14 @@ defmodule RedactEx.Redacter do
   ## Example
 
       iex> defmodule MyApp.Redacting do
-              @moduledoc false
-              use RedactEx.Redacter, redacters: [
-                {"redact_three", length: 3, algorithm: :simple},
-                {"redact", lengths: 1..3, algorithm: :simple},
-              ]
-           end
+      ...>    @moduledoc false
+      ...>    use RedactEx.Redacter, redacters: [
+      ...>      {"redact_three", length: 3, algorithm: :simple},
+      ...>      {"redact", lengths: 1..3, algorithm: :simple}
+      ...>    ]
+      ...> end
+      iex> MyApp.Redacting.redact("test")
+      ...> "t***"
 
       This will expose the following functions:
            * `MyApp.Redacting.redact` with fast matches on input of length 1, 2, 3
