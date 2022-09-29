@@ -21,9 +21,9 @@ See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving r
 
 ## TODO
 
-   [ ] Switch to enable/disable masking per environment
-   [ ] Expand explanation of fallback custom implementations of algorithms
-   [ ] fix dialyzer :(
+- [ ] Switch to enable/disable masking per environment
+- [ ] Expand explanation of fallback custom implementations of algorithms
+- [ ] fix dialyzer :(
 
 ## Open Points
 
