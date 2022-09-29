@@ -87,7 +87,9 @@ defmodule RedactEx.Redacter do
 
   @spec __using__(opts :: list()) :: any()
   defmacro __using__(opts) do
-    redacters = Configuration.parse(opts, Mix.env())
+    redacters =
+      opts
+      |> Configuration.parse(Mix.env(), __CALLER__)
 
     for {alias_name, alias_redacters} <- redacters do
       lengths = Enum.map(alias_redacters, fn %{string_length: string_length} -> string_length end)

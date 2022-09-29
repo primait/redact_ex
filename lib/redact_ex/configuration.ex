@@ -26,15 +26,17 @@ defmodule RedactEx.Configuration do
   Return configurations grouped by name, so we can generate matching and catchall in a good order
   when needed
   """
-  @spec parse(configuration :: list(), current_env :: atom()) :: %{atom() => list(map())}
-  def parse(configuration, current_env) when is_list(configuration),
+  @spec parse(configuration :: list(), current_env :: atom(), macro_env :: Macro.t()) :: %{
+          atom() => list(map())
+        }
+  def parse(configuration, current_env, macro_env) when is_list(configuration),
     do:
       configuration
       |> Keyword.fetch!(:redacters)
-      |> Enum.flat_map(&parse_redacter/1)
+      |> Enum.flat_map(&parse_redacter(&1, macro_env))
       |> reject_by_env(current_env)
       |> Enum.group_by(fn %{name: name} = _config -> name end)
-      |> Enum.map(&add_fallback_redacter!(&1))
+      |> Enum.map(&add_fallback_redacter!(&1, macro_env))
       |> Enum.into(%{})
 
   defp reject_by_env(redacters, current_env),
@@ -43,23 +45,24 @@ defmodule RedactEx.Configuration do
         current_env in refute_envs
       end)
 
-  defp parse_redacter({aliases, config}) when is_list(aliases),
-    do: Enum.flat_map(aliases, &map_lengths_and_parse(&1, config))
+  defp parse_redacter({aliases, config}, macro_env) when is_list(aliases),
+    do: Enum.flat_map(aliases, &map_lengths_and_parse(&1, config, macro_env))
 
   # Single name: all defaults apply
   # Name will be normalized later
-  defp parse_redacter(name) when is_atom(name) or is_binary(name),
-    do: map_lengths_and_parse(name, @default_configuration)
+  defp parse_redacter(name, macro_env) when is_atom(name) or is_binary(name),
+    do: map_lengths_and_parse(name, @default_configuration, macro_env)
 
-  defp parse_redacter({name, config}), do: map_lengths_and_parse(name, config)
+  defp parse_redacter({name, config}, macro_env),
+    do: map_lengths_and_parse(name, config, macro_env)
 
-  defp map_lengths_and_parse(name, config) do
+  defp map_lengths_and_parse(name, config, macro_env) do
     config
     |> get_lengths_from_config(name)
-    |> Enum.map(&do_parse_redacter(&1, name, config))
+    |> Enum.map(&do_parse_redacter(&1, name, config, macro_env))
   end
 
-  defp do_parse_redacter(string_length, given_name, given_config)
+  defp do_parse_redacter(string_length, given_name, given_config, macro_env)
        when is_integer(string_length) or string_length == :* do
     config = Keyword.merge(@default_configuration, given_config)
 
@@ -68,7 +71,8 @@ defmodule RedactEx.Configuration do
     redacted_size = Keyword.fetch!(config, :redacted_size)
     needs_fallback_function = needs_fallback_function?(string_length)
 
-    algorithm = config |> Keyword.fetch!(:algorithm) |> validate_algorithm()
+    algorithm =
+      config |> Keyword.fetch!(:algorithm) |> Macro.expand(macro_env) |> validate_algorithm()
 
     name = alias_name(given_name)
 
@@ -139,11 +143,13 @@ defmodule RedactEx.Configuration do
     end
   end
 
-  defp add_fallback_redacter!({key, contexts}) do
+  defp add_fallback_redacter!({key, contexts}, macro_env) do
     case Enum.split_with(contexts, fn %Context{length: len} -> len != :* end) do
       {non_fallback_contexts, []} ->
         {key,
-         Enum.concat(non_fallback_contexts, [do_parse_redacter(:*, key, @default_configuration)])}
+         Enum.concat(non_fallback_contexts, [
+           do_parse_redacter(:*, key, @default_configuration, macro_env)
+         ])}
 
       {non_fallback_contexts, [fallback_context]} ->
         {key, Enum.concat(non_fallback_contexts, [fallback_context])}
