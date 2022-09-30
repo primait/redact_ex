@@ -74,6 +74,8 @@ defprotocol RedactEx.Redactable do
   @type any_container :: any()
   @type t :: container() | binary_container() | any_container()
 
+  @dialyzer {:nowarn_function, redact: 1}
+
   @doc """
   Redacts `value` hiding sensitive information
   """
