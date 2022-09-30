@@ -1,19 +1,7 @@
 defmodule RedactEx.DeriveTest do
   use ExUnit.Case, aync: true
 
-  defmodule Redacter do
-    def redact0(value), do: "#{value} redacted0"
-    def redact1(value), do: "#{value} redacted1"
-  end
-
-  defmodule DeriveMe do
-    @derive {RedactEx.Redactable,
-             fields: [
-               field0: {RedactEx.DeriveTest.Redacter, :redact0},
-               field1: {RedactEx.DeriveTest.Redacter, :redact1}
-             ]}
-    defstruct [:field0, :field1]
-  end
+  alias Support.RedactEx.Derive.DeriveMe
 
   test "DeriveMe is redactable" do
     deriveme = %DeriveMe{

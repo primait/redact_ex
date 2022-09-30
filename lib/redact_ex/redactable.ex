@@ -5,17 +5,37 @@ defprotocol RedactEx.Redactable do
 
   You can derive Redactable protocol for a struct by using
 
+  ``` elixir
+  defmodule MyApp.RedactStruct do
+    @derive RedactEx.Redactable(
+      fields: [
+        myfield1: {MyModule, :redact_function_one},
+        myfield2: {MyModule, :redact_function_two}
+    ])
+    defstruct [:myfield1, :myfield2]
+  end
   ```
-  @derive RedactEx.Redactable(
-    fields: [
-      myfield1: {MyModule, :redact_function_one},
-      myfield2: {MyModule, :redact_function_two}
-  ])
-  defstruct [:myfield1, :myfield2]
+
+  e.g. suppose you define a module like
+
   ```
+  #{File.read!("./test/support/derive/redact_struct.ex")}
+  ```
+
+  then you can expect it to have derived the `RedactEx.Redactable` protocol
+
+      ```
+      iex> %MyApp.RedactStruct{myfield: "reverseme"} |> RedactEx.Redactable.redact() |> Map.get(:myfield)
+      "emesrever"
+      ```
+
+  ## Best Practices
 
   Good practices could be to implement the Inspect protocol for sensitive data and use the derived `redact`
   capabilities of the inspected module inside its implementation.
+
+  Then you can enforce `inspect`ing structures in your logs or export functions. Unluckily this is not a simple practice
+  to enforce in an automatic flavour.
   """
 
   @fallback_to_any true
@@ -28,7 +48,7 @@ defprotocol RedactEx.Redactable do
   @doc """
   Redacts `value` hiding sensitive information
   """
-  @spec redact(value :: t()) :: t()
+  @spec redact(value :: t()) :: any()
   def redact(value)
 end
 
@@ -44,8 +64,12 @@ defimpl RedactEx.Redactable, for: Any do
           Enum.reduce(
             unquote(fields),
             value,
-            fn {key, {module, function}}, acc ->
-              Map.update!(acc, key, fn val -> :erlang.apply(module, function, [val]) end)
+            fn
+              {key, :redact}, acc ->
+                Map.update!(acc, key, &RedactEx.Redactable.redact/1)
+
+              {key, {module, function}}, acc ->
+                Map.update!(acc, key, fn val -> :erlang.apply(module, function, [val]) end)
             end
           )
         end

@@ -24,6 +24,7 @@ defmodule RedactEx.Algorithms.Algorithm do
   @doc """
   Check that this behaviour is implemented in given module
   """
+  @spec implemented_by?(module()) :: boolean()
   def implemented_by?(module) do
     :attributes
     |> module.module_info()

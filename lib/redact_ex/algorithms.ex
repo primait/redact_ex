@@ -28,11 +28,8 @@ defmodule RedactEx.Algorithms do
            {:implements, Algorithm.implemented_by?(module)} do
       module
     else
-      {:ensure, error} ->
-        raise "Module [#{inspect(algorithm_module)}] could not be loaded [#{inspect(error)}]"
-
-      {:implements, _} ->
-        raise "Module [#{inspect(algorithm_module)}] does not implements the #{__MODULE__} behaviour"
+      # This function is not really needed, but managing the error branches here makes dialyzer unconfortable
+      error -> manage_error(algorithm_module, error)
     end
   end
 
@@ -44,4 +41,13 @@ defmodule RedactEx.Algorithms do
 
   defp map_base_algorithm(@algorithm_simple), do: RedactEx.Algorithms.Simple
   defp map_base_algorithm(@algorithm_center), do: RedactEx.Algorithms.Center
+
+  defp manage_error(algorithm_module, {:ensure, error}),
+    do: raise("Module [#{inspect(algorithm_module)}] could not be loaded [#{inspect(error)}]")
+
+  defp manage_error(algorithm_module, {:implements, _}),
+    do:
+      raise(
+        raise "Module [#{inspect(algorithm_module)}] does not implements the #{__MODULE__} behaviour"
+      )
 end
