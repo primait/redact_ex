@@ -1,5 +1,7 @@
 defprotocol RedactEx.Redactable do
   @moduledoc """
+  # Redactable
+
   Protocol for defining a redact-able item, e.g. an item whose internal elements could be masked
   It shall return a redact-ed item of the same type as the input item
 
@@ -20,26 +22,32 @@ defprotocol RedactEx.Redactable do
 
   * `:fields`    possible values of `fields` are a keyword list of configurations, where configuration can be
     * `{module, function}`, e.g.
+
       ``` elixir
       fields: [
           myfield1: {MyModule, :redact_function_one},
           myfield2: {MyModule, :redact_function_two},
       ]
       ```
+
       In this case redacting will be applied to `myfield1` and `myfield2`  using module.function as configured
     * `:redact`, e.g.
+
       ``` elixir
       fields: [
         field: :redact
       ]
       ```
+
       In this case it is expected for value in `field` to have an Impl for `RedactEx.Redactable`, and `RedactEx.Redactable.redact/1` will be called
     * `:drop`, e.g.
+
       ``` elixir
       fields: [
         field: :drop
       ]
       ```
+
       In this case `:field` key is entirely dropped. **NOTE** that this also means
       struct information will be lost, and the value will become a map
 
