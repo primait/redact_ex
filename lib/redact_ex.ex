@@ -38,22 +38,26 @@ defmodule RedactEx do
    configured based on your needs and optionally using functions from a module generated with
    `RedactEx.Redacter` helpers, or manually define an implementation of choice, e.g.
 
-      iex> defmodule MyApp.RedactStruct do
-      ...>   @derive RedactEx.Redactable(
-      ...>   fields: [
-      ...>     myfield1: {MyModule, :redact_function_one},
-      ...>     myfield2: {MyModule, :redact_function_two},
-      ...>   ])
+      iex> defmodule MyRedacterModule do
+      ...>   def redact_function_one(_), do: "(redacted1)"
+      ...>   def redact_function_two(_), do: "(redacted2)"
+      ...> end
+      ...> defmodule MyApp.RedactStruct do
+      ...>   @derive {RedactEx.Redactable,
+      ...>     fields: [
+      ...>       myfield1: {MyRedacterModule, :redact_function_one},
+      ...>       myfield2: {MyRedacterModule, :redact_function_two},
+      ...>     ]}
       ...>   defstruct [:myfield1, :myfield2]
       ...> end
 
    or
 
-      iex> defmodule MyApp.RedactStruct do
+      iex> defmodule MyApp.OtherRedactStruct do
       ...>   defstruct [:myfield1, :myfield2]
       ...> end
-      ...> defimpl RedactEx.Redactable, for: MyApp.RedactStruct do
-      ...>   def redact(_value), do: %MyApp.RedactStruct{myfield1: "(redacted)", myfield2: "(redacted)"}
+      ...> defimpl RedactEx.Redactable, for: MyApp.OtherRedactStruct do
+      ...>   def redact(_value), do: %MyApp.OtherRedactStruct{myfield1: "(redacted)", myfield2: "(redacted)"}
       ...> end
 
   ### 2. Use `inspect` protocol at your advantage

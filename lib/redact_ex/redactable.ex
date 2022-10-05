@@ -9,11 +9,11 @@ defprotocol RedactEx.Redactable do
 
   ``` elixir
   defmodule MyApp.RedactStruct do
-    @derive RedactEx.Redactable(
+    @derive {RedactEx.Redactable,
       fields: [
         myfield1: {MyModule, :redact_function_one},
         myfield2: {MyModule, :redact_function_two},
-    ])
+    ]}
     defstruct [:myfield1, :myfield2]
   end
   ```
