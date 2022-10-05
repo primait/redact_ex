@@ -16,6 +16,7 @@ to  your understanding of the system, and at the same moment it does not expose 
 
 ## Usage
 
+See [RedactEx](./lib/redact_ex.ex) for general information about this library and its intended use
 See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings
 See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving redactable structs
 
