@@ -5,6 +5,5 @@ USER app
 
 WORKDIR /code
 
-COPY entrypoint /code/entrypoint
-
-ENTRYPOINT ["/code/entrypoint"]
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD []
