@@ -4,51 +4,43 @@
 
 Utilities to redact sensitive data in Elixir projects
 
-## Run locally
+## Redacting
 
-### Setup Auth0
+By *redacting* we consider here the practice of hiding part of a potentially sensitive information, while keeping a small part
+of it to allow understanding that it may be a valid one.
 
-To access some endpoints, queries and/or mutations, requests will need to be authenticated via a JWT.
+For example, you may want to *redact* a telephone number in your logs, but keep the initial digits (e.g. the prefix) because that information is relevant
+to  your understanding of the system, and at the same moment it does not expose any sensitive information.
 
-In staging and production-like environment this will be handled via Auth0.
-However, to simplify local development, on the local dev environment JWTs are accepted even when their signature is not valid (only a warning will be logged on invalid JWT signature).
-This means that it is possible to use locally forged JWT tokens for local instances of this application.
+## Configuration
 
-To forge a new token for local development open a `iex` shell with `iex -S mix` and run
+## Usage
 
-```elixir
-PrimaAuth0Ex.LocalToken.forge("redact_ex", %{permissions: ["some:permission"]})
+See [RedactEx](./lib/redact_ex.ex) for general information about this library and its intended use
+See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings
+See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving redactable structs
+
+## Contributing
+
+The recommended way to work is to use [asdf](https://github.com/asdf-vm/asdf) language runtime versions manager.
+
+You will find a [.tool-versions.recommended](./tool-versions.recommended) file that - hopefully - is up to date with the versions used in CI.
+
+Please be sure that your test pass with those versions before pushing to save yourself the wait for automatic checks.
+
+``` bash
+# Use project's defaults
+cp .tool-versions.recommended .tool-versions
 ```
 
-### Run
+## TODO
 
-The recommended way to work locally is to spawn a shell inside a Docker container with the following command:
+- [ ] Expand explanation of fallback custom implementations of algorithms
+- [ ] fix dialyzer :(
 
-```bash
-docker-compose run --service-ports --rm web bash
-```
+## Open Points
 
-Then, to install dependencies and setup the database run:
-
-```bash
-mix deps.get
-mix ecto.setup
-```
-
-Then, run the application as follows:
-
-```bash
-mix phx.server
-```
-
-The GraphQL endpoint will be available at http://localhost:4000/graphql.
-
-Tests can be run with:
-
-```bash
-mix test
-```
-
-## API examples
-
-You can find an Insomnia collection with API usage examples in the `examples` folder.
+   * Other ways of masking (e.g. first X letters and last Y exposed)
+   * maybe-email masker (with fallback)?
+   * define a default strict implementation for `redact` in the `Any` implementation?
+   * some other default magic configuration in derive, e.g. a default module+function?
