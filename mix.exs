@@ -5,10 +5,12 @@ defmodule RedactEx.MixProject do
     [
       app: :redact_ex,
       version: get_version(System.get_env("DRONE_TAG")),
+      source_url: "https://github.com/primait/redact_ex",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
       aliases: aliases(),
+      description: description(),
       deps: deps(),
       dialyzer: [
         plt_add_apps: [:mix, :ex_unit],
@@ -26,12 +28,8 @@ defmodule RedactEx.MixProject do
       name: "RedactEx",
       source_url: "https://github.com/primait/redact_ex",
       homepage_url: "https://github.com/primait/redact_ex",
-      docs: [
-        # The main page in the docs
-        main: "RedactEx",
-        # logo: "path/to/logo.png",
-        extras: ["README.md"]
-      ]
+      docs: docs(),
+      package: package()
     ]
   end
 
@@ -89,6 +87,24 @@ defmodule RedactEx.MixProject do
       ]
     ]
   end
+
+  defp docs,
+    do: [
+      # The main page in the docs
+      main: "RedactEx",
+      # logo: "path/to/logo.png",
+      extras: ["README.md"]
+    ]
+
+  defp package,
+    do: [
+      name: "redact_ex",
+      maintainers: ["Luca Dei Zotti"],
+      licenses: ["MIT"],
+      links: %{"Github" => "https://github.com/primait/redact_ex"}
+    ]
+
+  defp description, do: "Utilities and best practices to redact potentially sensitive data"
 
   defp get_version(""), do: "0.0.0-dev"
   defp get_version(nil), do: "0.0.0-dev"
