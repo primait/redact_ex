@@ -1,7 +1,12 @@
 defmodule RedactEx.Algorithms.Center do
   @moduledoc """
-  Simple redacting algorithm that will keep the initial part of a string and
+  Simple redacting algorithm that will keep the initial and last parts of a string and
   substitutes the remaining part with given character
+
+  ```
+  # e.g.
+  value_to_redact -> va***********ct
+  ```
   """
   @behaviour RedactEx.Algorithms.Algorithm
 
