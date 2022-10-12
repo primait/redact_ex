@@ -3,9 +3,9 @@ defmodule RedactEx do
   RedactEx provides protocols and derivatoin utilities to work with
   sensitive data that should be redacted in logs and external facing tools
 
-  * [RedactEx.Redacter](./RedactEx.Redacter.html) module gives you automagical generation of redacting
+  * `RedactEx.Redacter` module gives you automagical generation of redacting
      functions under a desired module namespace
-  * [RedactEx.Redactable](./RedactEx.Redactable.html) is the protocol for which implementation and
+  * `RedactEx.Redactable` is the protocol for which implementation and
      derivation should be created to ensure the best possible practices
      in your codebase
 
@@ -15,7 +15,7 @@ defmodule RedactEx do
 
   ## Generate your redacter functions
 
-  You can generate functions to redact your specific data using [RedactEx.Redacter](./RedactEx.Redacter.html) module.
+  You can generate functions to redact your specific data using `RedactEx.Redacter` module.
 
       iex> defmodule MyApp.Redacting do
       ...>    @moduledoc false
@@ -25,18 +25,24 @@ defmodule RedactEx do
       ...>    ]
       ...> end
 
-   This will generate optimized functions and/or functions adopting the standards
-   and algorithms defined in this library.
+  This will generate optimized functions and/or functions adopting the standards
+  and algorithms defined in this library.
+  In particular:
 
-   ## Protect your structs
+   * `redact_three/1` will be created with an optimized match for strings of length 3 and a non optimized fallback function
+     for strings with generic length
+   * `redact/1` will be created with three optimized match for strings of lengths 1, 2 and 3 and a non optimized fallback function
+     for strings with generic length
 
-   The recommended way of protecting your structs is
+  ## Protect your structs
 
-   ### 1. Derive or implement RedactEx.Redactable
+  The recommended way of protecting your structs is
 
-   You can use the `@derive` macro from the [RedactEx.Redactable](./RedactEx.Redactable.html) protocol,
-   configured based on your needs and optionally using functions from a module generated with
-   `RedactEx.Redacter` helpers, or manually define an implementation of choice, e.g.
+  ### 1. Derive or implement `RedactEx.Redactable`
+
+  You can use the `@derive` macro from the `RedactEx.Redactable` protocol,
+  configured based on your needs and optionally using functions from a module generated with
+  `RedactEx.Redacter` helpers, or manually define an implementation of choice, e.g.
 
       iex> defmodule MyRedacterModule do
       ...>   def redact_function_one(_), do: "(redacted1)"
@@ -51,7 +57,7 @@ defmodule RedactEx do
       ...>   defstruct [:myfield1, :myfield2]
       ...> end
 
-   or
+  or
 
       iex> defmodule MyApp.OtherRedactStruct do
       ...>   defstruct [:myfield1, :myfield2]

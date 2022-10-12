@@ -58,7 +58,7 @@ defmodule RedactEx.Redacter do
     * `redacted_size`   integer | :auto                     length of the resulting string that will be set as redacted. Defaults to `#{@default_redacted_size}`,
                                                             which will set it to `expected_string_length - keep`
     * `algorithm`       atom | module                       algorithm used to redact the string. Defaults to `#{@default_redacting_algorithm}`
-                                                            if a module is given, it must implement the [RedactEx.Algorithms.Algorithm](./lib/algorithms/algorithm.ex) behaviour
+                                                            if a module is given, it must implement the `RedactEx.Algorithms.Algorithm` behaviour
                                                             Supported atoms are
                                                             - `:simple` (alias for `RedactEx.Algorithms.Simple`)
                                                             - `:center` (alias for `RedactEx.Algorithms.Center`)
@@ -67,7 +67,7 @@ defmodule RedactEx.Redacter do
     * `lengths`         [integer or `:*`] | min..max        lengths of the strings to be considered. `:*` stands for the fallback function configuration. A function for each specific length will be generated
     * `except`          list(atom())                        list of environments for which this configuration will have effect
 
-  ## Example
+  ### Example
 
       iex> defmodule MyApp.Redacting do
       ...>    @moduledoc false
@@ -83,6 +83,10 @@ defmodule RedactEx.Redacter do
            * `MyApp.Redacting.redact` with fast matches on input of length 1, 2, 3
            * `MyApp.Redacting.redact_three` with fast matches on input of length 3
            * both `redact/1` and `redact_three/1` will have a slower fallback function for input of different length
+
+  ## Custom algorithms
+
+  You can define custom algorithms to define your own implementations. Take a look at `RedactEx.Algorithms.Algorithm` behaviour.
   """
 
   @spec __using__(opts :: list()) :: any()

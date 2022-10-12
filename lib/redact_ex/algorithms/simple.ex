@@ -2,6 +2,11 @@ defmodule RedactEx.Algorithms.Simple do
   @moduledoc """
   Simple redacting algorithm that will keep the initial part of a string and
   substitutes the remaining part with given character
+
+  ```
+  # e.g.
+  value_to_redact -> valu************
+  ```
   """
   @behaviour RedactEx.Algorithms.Algorithm
 
