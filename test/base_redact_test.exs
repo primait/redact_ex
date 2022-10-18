@@ -28,5 +28,7 @@ defmodule RedactEx.BaseRedactTest do
 
     assert BaseTestRedacter.base(nil) == "(redacted)"
     assert BaseTestRedacter.string_base(nil) == "(redacted)"
+
+    assert BaseTestRedacter.fallback(nil) == "(fallback redact)"
   end
 end
