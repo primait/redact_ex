@@ -26,6 +26,7 @@ defmodule RedactEx.BaseRedactTest do
     assert BaseTestRedacter.base("1234567890") == "12********"
     assert BaseTestRedacter.string_base("1234567890") == "12********"
 
-    assert BaseTestRedacter.base(nil) == "(fully redacted as not a string)"
+    assert BaseTestRedacter.base(nil) == "(redacted)"
+    assert BaseTestRedacter.string_base(nil) == "(redacted)"
   end
 end

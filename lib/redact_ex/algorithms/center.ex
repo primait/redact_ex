@@ -10,8 +10,10 @@ defmodule RedactEx.Algorithms.Center do
   """
   @behaviour RedactEx.Algorithms.Algorithm
 
+  alias RedactEx.Configuration.Context
+
   @impl RedactEx.Algorithms.Algorithm
-  def generate_ast(%{
+  def generate_ast(%Context{
         plaintext_length: nil,
         redacted_length: nil,
         keep: keep,
@@ -19,7 +21,7 @@ defmodule RedactEx.Algorithms.Center do
         redacter: redacter
       }) do
     quote do
-      def unquote(name)(value) do
+      def unquote(name)(value) when is_binary(value) do
         string_length = String.length(value)
         keep_size = string_length * unquote(keep) / 100 / 2
         head_size = ceil(keep_size)
@@ -34,10 +36,12 @@ defmodule RedactEx.Algorithms.Center do
             center_content <> String.slice(value, (string_length - tail_size)..string_length)
         end
       end
+
+      def unquote(name)(_value), do: "(redacted)"
     end
   end
 
-  def generate_ast(%{
+  def generate_ast(%Context{
         plaintext_length: plaintext_length,
         redacted_length: redacted_length,
         name: name,

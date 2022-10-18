@@ -42,11 +42,11 @@ defmodule RedactEx.Algorithms.Simple do
         end
       end
 
-      def unquote(name)(_value), do: "(fully redacted as not a string)"
+      def unquote(name)(_value), do: "(redacted)"
     end
   end
 
-  def generate_ast(%{
+  def generate_ast(%Context{
         plaintext_length: plaintext_length,
         redacted_length: redacted_length,
         name: name,

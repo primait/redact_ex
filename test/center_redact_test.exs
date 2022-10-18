@@ -13,4 +13,9 @@ defmodule RedactEx.CenterRedactTest do
     assert CenterTestRedacter.center_unknown("12345678901234567890") ==
              "123***************90"
   end
+
+  test "center redacter works as expected for fallback values" do
+    assert CenterTestRedacter.center_unknown(nil) == "(redacted)"
+    assert CenterTestRedacter.center_ten(nil) == "(redacted)"
+  end
 end
