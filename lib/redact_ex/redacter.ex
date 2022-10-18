@@ -66,6 +66,7 @@ defmodule RedactEx.Redacter do
     * `length`          integer or  `:*`                    length of the string to be considered. `:*` stands for the fallback function configuration. Is overridden by key `:lengths` if present
     * `lengths`         [integer or `:*`] | min..max        lengths of the strings to be considered. `:*` stands for the fallback function configuration. A function for each specific length will be generated
     * `except`          list(atom())                        list of environments for which this configuration will have effect
+    * `fallback_value`  string                              fixed value for redacting non-string values
 
   ### Example
 
