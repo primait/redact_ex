@@ -18,7 +18,8 @@ defmodule RedactEx.Algorithms.Simple do
         keep: keep,
         name: name,
         redacter: redacter,
-        redacted_size: redacted_size
+        redacted_size: redacted_size,
+        fallback_value: fallback_value
       }) do
     quote do
       def unquote(name)(value) when is_binary(value) do
@@ -42,7 +43,7 @@ defmodule RedactEx.Algorithms.Simple do
         end
       end
 
-      def unquote(name)(_value), do: "(redacted)"
+      def unquote(name)(_value), do: unquote(fallback_value)
     end
   end
 

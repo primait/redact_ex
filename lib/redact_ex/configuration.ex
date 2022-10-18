@@ -9,6 +9,7 @@ defmodule RedactEx.Configuration do
   @default_redacting_algorithm RedactEx.Algorithms.algorithm_simple()
   @default_lengths [:*]
   @default_except []
+  @default_fallback_value "(redacted)"
 
   @default_configuration [
     keep: @default_redacting_keep,
@@ -16,7 +17,8 @@ defmodule RedactEx.Configuration do
     redacter: @default_redacter,
     algorithm: @default_redacting_algorithm,
     lengths: @default_lengths,
-    except: @default_except
+    except: @default_except,
+    fallback_value: @default_fallback_value
   ]
 
   alias RedactEx.Algorithms
@@ -69,6 +71,7 @@ defmodule RedactEx.Configuration do
     except = Keyword.fetch!(config, :except)
     keep = Keyword.fetch!(config, :keep)
     redacted_size = Keyword.fetch!(config, :redacted_size)
+    fallback_value = Keyword.fetch!(config, :fallback_value)
     needs_fallback_function = needs_fallback_function?(string_length)
 
     algorithm =
@@ -98,7 +101,8 @@ defmodule RedactEx.Configuration do
       algorithm: algorithm,
       needs_fallback_function: needs_fallback_function,
       extra: extra,
-      except: except
+      except: except,
+      fallback_value: fallback_value
     }
   end
 
