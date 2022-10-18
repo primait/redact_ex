@@ -40,7 +40,7 @@ cp .tool-versions.recommended .tool-versions
 
 ## Open Points
 
-   * Other ways of masking (e.g. first X letters and last Y exposed)
-   * maybe-email masker (with fallback)?
+   * Other ways of redacting (e.g. first X letters and last Y exposed)
+   * maybe-email redacter (with fallback)?
    * define a default strict implementation for `redact` in the `Any` implementation?
    * some other default magic configuration in derive, e.g. a default module+function?

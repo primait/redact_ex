@@ -2,7 +2,7 @@ defprotocol RedactEx.Redactable do
   @moduledoc """
   # Redactable
 
-  Protocol for defining a redact-able item, e.g. an item whose internal elements could be masked
+  Protocol for defining a redact-able item, e.g. an item whose internal elements could be redacted
   It shall return a redact-ed item of the same type as the input item
 
   You can derive Redactable protocol for a struct by using
