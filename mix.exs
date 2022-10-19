@@ -4,7 +4,7 @@ defmodule RedactEx.MixProject do
   def project do
     [
       app: :redact_ex,
-      version: get_version(System.get_env("DRONE_TAG")),
+      version: "0.1.3",
       source_url: "https://github.com/primait/redact_ex",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -105,8 +105,4 @@ defmodule RedactEx.MixProject do
     ]
 
   defp description, do: "Utilities and best practices to redact potentially sensitive data"
-
-  defp get_version(""), do: "0.0.0-dev"
-  defp get_version(nil), do: "0.0.0-dev"
-  defp get_version(drone_tag), do: drone_tag
 end
