@@ -1,7 +1,7 @@
-defmodule RedactEx.Redacter do
+defmodule RedactEx.Redactor do
   @default_redacting_keep 25
   @default_redacted_size :auto
-  @default_redacter "*"
+  @default_redactor "*"
 
   @default_redacting_algorithm RedactEx.Algorithms.algorithm_simple()
 
@@ -38,23 +38,23 @@ defmodule RedactEx.Redacter do
 
   | Algorithm | Description |
   | --------- | ----------- |
-  | `:simple` | keeps the first `keep`% of the string and sets the rest to `redacter`, according to `redacted_size` |
-  | `:center` | splits `keep`% of the string between head and tail, and sets the middle to `redacter`, according to `redacted_size` |
+  | `:simple` | keeps the first `keep`% of the string and sets the rest to `redactor`, according to `redacted_size` |
+  | `:center` | splits `keep`% of the string between head and tail, and sets the middle to `redactor`, according to `redacted_size` |
 
   ## Configuration
 
   Options:
-   `redacters`  a list of redacting rules. Each element can be:
-                - a tuple in the form {redacter_function_name, configuration}
-                - a tuple in the form {[redacter_function_names], configuration}
-                - a single redacter_function_name
-                `redacter_function_name` can be an atom or string value in all cases
+   `redactors`  a list of redacting rules. Each element can be:
+                - a tuple in the form {redactor_function_name, configuration}
+                - a tuple in the form {[redactor_function_names], configuration}
+                - a single redactor_function_name
+                `redactor_function_name` can be an atom or string value in all cases
 
   ### Common configuration
 
-  Configuration of a redacter is a keyword list containing
+  Configuration of a redactor is a keyword list containing
 
-    * `redacter`        string                              character used to redact the hidden part of the. Defaults to `#{@default_redacter}`
+    * `redactor`        string                              character used to redact the hidden part of the. Defaults to `#{@default_redactor}`
     * `redacted_size`   integer | :auto                     length of the resulting string that will be set as redacted. Defaults to `#{@default_redacted_size}`,
                                                             which will set it to `expected_string_length - keep`
     * `algorithm`       atom | module                       algorithm used to redact the string. Defaults to `#{@default_redacting_algorithm}`
@@ -66,12 +66,13 @@ defmodule RedactEx.Redacter do
     * `length`          integer or  `:*`                    length of the string to be considered. `:*` stands for the fallback function configuration. Is overridden by key `:lengths` if present
     * `lengths`         [integer or `:*`] | min..max        lengths of the strings to be considered. `:*` stands for the fallback function configuration. A function for each specific length will be generated
     * `except`          list(atom())                        list of environments for which this configuration will have effect
+    * `fallback_value`  string                              fixed value for redacting non-string values
 
   ### Example
 
       iex> defmodule MyApp.Redacting do
       ...>    @moduledoc false
-      ...>    use RedactEx.Redacter, redacters: [
+      ...>    use RedactEx.Redactor, redactors: [
       ...>      {"redact_three", length: 3, algorithm: :simple},
       ...>      {"redact", lengths: 1..3, algorithm: :simple}
       ...>    ]
@@ -91,16 +92,16 @@ defmodule RedactEx.Redacter do
 
   @spec __using__(opts :: list()) :: any()
   defmacro __using__(opts) do
-    redacters = Configuration.parse(opts, Mix.env(), __CALLER__)
+    redactors = Configuration.parse(opts, Mix.env(), __CALLER__)
 
-    for {alias_name, alias_redacters} <- redacters do
-      lengths = Enum.map(alias_redacters, fn %{string_length: string_length} -> string_length end)
+    for {alias_name, alias_redactors} <- redactors do
+      lengths = Enum.map(alias_redactors, fn %{string_length: string_length} -> string_length end)
 
       doc_ast =
         quote do
           @doc """
-          Redacter `#{unquote(alias_name)}` for strings of lengths #{unquote(inspect(lengths))}
-          This is a self-generated function from `#{RedactEx.Redacter}`
+          Redactor `#{unquote(alias_name)}` for strings of lengths #{unquote(inspect(lengths))}
+          This is a self-generated function from `#{RedactEx.Redactor}`
           """
         end
 
@@ -111,9 +112,9 @@ defmodule RedactEx.Redacter do
         end
 
       fun_ast =
-        for %Context{algorithm: algorithm} = redacter_configuration <-
-              alias_redacters do
-          Algorithms.generate_ast(algorithm, redacter_configuration)
+        for %Context{algorithm: algorithm} = redactor_configuration <-
+              alias_redactors do
+          Algorithms.generate_ast(algorithm, redactor_configuration)
         end
 
       List.flatten([doc_ast, function_spec_ast, fun_ast])

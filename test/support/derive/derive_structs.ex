@@ -1,4 +1,4 @@
-defmodule Support.RedactEx.Derive.Redacter do
+defmodule Support.RedactEx.Derive.Redactor do
   @moduledoc false
   def redact0(value) when is_binary(value), do: "#{value} redacted0"
 
@@ -9,7 +9,7 @@ defmodule Support.RedactEx.Derive.SubDeriveMe do
   @moduledoc false
   @derive {RedactEx.Redactable,
            fields: [
-             field: {Support.RedactEx.Derive.Redacter, :redact0}
+             field: {Support.RedactEx.Derive.Redactor, :redact0}
            ]}
   defstruct [:field]
 end
@@ -30,8 +30,8 @@ defmodule Support.RedactEx.Derive.DeriveMe do
   @moduledoc false
   @derive {RedactEx.Redactable,
            fields: [
-             field0: {Support.RedactEx.Derive.Redacter, :redact0},
-             field1: {Support.RedactEx.Derive.Redacter, :redact1},
+             field0: {Support.RedactEx.Derive.Redactor, :redact0},
+             field1: {Support.RedactEx.Derive.Redactor, :redact1},
              substruct: :redact
            ]}
   defstruct [:field0, :field1, :substruct, :keepme, :keepme_number]
@@ -41,7 +41,7 @@ defmodule Support.RedactEx.Derive.DropMe do
   @moduledoc false
   @derive {RedactEx.Redactable,
            fields: [
-             field0: {Support.RedactEx.Derive.Redacter, :redact0},
+             field0: {Support.RedactEx.Derive.Redactor, :redact0},
              field_drop: :drop
            ]}
   defstruct [:field0, :field_drop]

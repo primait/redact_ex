@@ -17,8 +17,9 @@ defmodule RedactEx.Algorithms.Simple do
         length: :*,
         keep: keep,
         name: name,
-        redacter: redacter,
-        redacted_size: redacted_size
+        redactor: redactor,
+        redacted_size: redacted_size,
+        fallback_value: fallback_value
       }) do
     quote do
       def unquote(name)(value) when is_binary(value) do
@@ -31,7 +32,7 @@ defmodule RedactEx.Algorithms.Simple do
             unquote(redacted_size)
           )
 
-        redacted = Context.get_redacter_string(redacted_length, unquote(redacter))
+        redacted = Context.get_redactor_string(redacted_length, unquote(redactor))
 
         case max(0, plaintext_length - 1) do
           0 ->
@@ -42,11 +43,11 @@ defmodule RedactEx.Algorithms.Simple do
         end
       end
 
-      def unquote(name)(_value), do: "(fully redacted as not a string)"
+      def unquote(name)(_value), do: unquote(fallback_value)
     end
   end
 
-  def generate_ast(%{
+  def generate_ast(%Context{
         plaintext_length: plaintext_length,
         redacted_length: redacted_length,
         name: name,
