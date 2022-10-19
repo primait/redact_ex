@@ -6,7 +6,7 @@ defmodule RedactEx.Configuration.Context do
   alias __MODULE__
 
   defstruct length: :*,
-            redacter: nil,
+            redactor: nil,
             keep: nil,
             plaintext_length: nil,
             redacted_size: nil,
@@ -43,12 +43,12 @@ defmodule RedactEx.Configuration.Context do
   @doc """
   Gets the actual redacted part of the string given configuration
   """
-  @spec get_redacter_string(size :: nil | integer(), redacter :: char() | any()) ::
+  @spec get_redactor_string(size :: nil | integer(), redactor :: char() | any()) ::
           nil | String.t()
-  def get_redacter_string(nil, _redacter), do: nil
+  def get_redactor_string(nil, _redactor), do: nil
 
-  def get_redacter_string(size, redacter) do
-    1..size |> Enum.map(fn _ -> redacter end) |> List.to_string()
+  def get_redactor_string(size, redactor) do
+    1..size |> Enum.map(fn _ -> redactor end) |> List.to_string()
   end
 
   # Get the length of the redacted part of data

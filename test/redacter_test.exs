@@ -1,4 +1,4 @@
-defmodule RedactEx.RedacterTest do
+defmodule RedactEx.RedactorTest do
   use ExUnit.Case, async: true
-  doctest RedactEx.Redacter
+  doctest RedactEx.Redactor
 end

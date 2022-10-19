@@ -17,7 +17,7 @@ defmodule RedactEx.Algorithms.Simple do
         length: :*,
         keep: keep,
         name: name,
-        redacter: redacter,
+        redactor: redactor,
         redacted_size: redacted_size,
         fallback_value: fallback_value
       }) do
@@ -32,7 +32,7 @@ defmodule RedactEx.Algorithms.Simple do
             unquote(redacted_size)
           )
 
-        redacted = Context.get_redacter_string(redacted_length, unquote(redacter))
+        redacted = Context.get_redactor_string(redacted_length, unquote(redactor))
 
         case max(0, plaintext_length - 1) do
           0 ->

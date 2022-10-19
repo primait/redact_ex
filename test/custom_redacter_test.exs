@@ -1,10 +1,10 @@
 defmodule RedactEx.CustomRedactTest do
   use ExUnit.Case, aync: true
 
-  alias Support.RedactEx.CustomRedacter
+  alias Support.RedactEx.CustomRedactor
 
-  test "Redacter in an external module works as expected" do
+  test "Redactor in an external module works as expected" do
     value = "some_value"
-    assert CustomRedacter.redact(value) == "(custom redact) #{value}"
+    assert CustomRedactor.redact(value) == "(custom redact) #{value}"
   end
 end

@@ -17,7 +17,7 @@ to  your understanding of the system, and at the same moment it does not expose 
 ## Usage
 
 See [RedactEx](./lib/redact_ex.ex) for general information about this library and its intended use
-See [RedactEx.Redacter](./lib/redact_ex/redacter.ex) for generating fast redacters for strings
+See [RedactEx.Redactor](./lib/redact_ex/redactor.ex) for generating fast redactors for strings
 See [RedactEx.Redactable](./lib/redact_ex/redactable.ex) protocol for deriving redactable structs
 
 ## Contributing
@@ -41,6 +41,6 @@ cp .tool-versions.recommended .tool-versions
 ## Open Points
 
    * Other ways of redacting (e.g. first X letters and last Y exposed)
-   * maybe-email redacter (with fallback)?
+   * maybe-email redactor (with fallback)?
    * define a default strict implementation for `redact` in the `Any` implementation?
    * some other default magic configuration in derive, e.g. a default module+function?

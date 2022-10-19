@@ -98,7 +98,7 @@ defimpl RedactEx.Redactable, for: Any do
     fields = fields_to_redact(struct, opts)
 
     case fields do
-      {redacter_module, function} -> redact_all_ast(module, redacter_module, function)
+      {redactor_module, function} -> redact_all_ast(module, redactor_module, function)
       fields when is_list(fields) -> redact_ast(module, fields)
     end
   end
@@ -110,11 +110,11 @@ defimpl RedactEx.Redactable, for: Any do
       description: "RedactEx.Redactable protocol must always be explicitly implemented"
   end
 
-  defp redact_all_ast(module, redacter_module, function) do
+  defp redact_all_ast(module, redactor_module, function) do
     quote do
       defimpl RedactEx.Redactable, for: unquote(module) do
         def redact(%_{} = value) do
-          :erlang.apply(unquote(redacter_module), unquote(function), [value])
+          :erlang.apply(unquote(redactor_module), unquote(function), [value])
         end
       end
     end
@@ -162,10 +162,10 @@ defimpl RedactEx.Redactable, for: Any do
       {_, action} when action in [:redact, :drop] ->
         true
 
-      {_, {redacter_module, redacter_function}} ->
-        Code.ensure_loaded!(redacter_module)
-        # true = Module.defines?(redacter_module, {redacter_function, 1})
-        true = Kernel.function_exported?(redacter_module, redacter_function, 1)
+      {_, {redactor_module, redactor_function}} ->
+        Code.ensure_loaded!(redactor_module)
+        # true = Module.defines?(redactor_module, {redactor_function, 1})
+        true = Kernel.function_exported?(redactor_module, redactor_function, 1)
     end)
   end
 

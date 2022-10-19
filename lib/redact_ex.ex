@@ -3,7 +3,7 @@ defmodule RedactEx do
   RedactEx provides protocols and derivatoin utilities to work with
   sensitive data that should be redacted in logs and external facing tools
 
-  * `RedactEx.Redacter` module gives you automagical generation of redacting
+  * `RedactEx.Redactor` module gives you automagical generation of redacting
      functions under a desired module namespace
   * `RedactEx.Redactable` is the protocol for which implementation and
      derivation should be created to ensure the best possible practices
@@ -13,13 +13,13 @@ defmodule RedactEx do
 
   RedactEx usual protection consists in two or more steps:
 
-  ## Generate your redacter functions
+  ## Generate your redactor functions
 
-  You can generate functions to redact your specific data using `RedactEx.Redacter` module.
+  You can generate functions to redact your specific data using `RedactEx.Redactor` module.
 
       iex> defmodule MyApp.Redacting do
       ...>    @moduledoc false
-      ...>    use RedactEx.Redacter, redacters: [
+      ...>    use RedactEx.Redactor, redactors: [
       ...>      {"redact_three", length: 3, algorithm: :simple},
       ...>      {"redact", lengths: 1..3, algorithm: :simple}
       ...>    ]
@@ -42,17 +42,17 @@ defmodule RedactEx do
 
   You can use the `@derive` macro from the `RedactEx.Redactable` protocol,
   configured based on your needs and optionally using functions from a module generated with
-  `RedactEx.Redacter` helpers, or manually define an implementation of choice, e.g.
+  `RedactEx.Redactor` helpers, or manually define an implementation of choice, e.g.
 
-      iex> defmodule MyRedacterModule do
+      iex> defmodule MyRedactorModule do
       ...>   def redact_function_one(_), do: "(redacted1)"
       ...>   def redact_function_two(_), do: "(redacted2)"
       ...> end
       ...> defmodule MyApp.RedactStruct do
       ...>   @derive {RedactEx.Redactable,
       ...>     fields: [
-      ...>       myfield1: {MyRedacterModule, :redact_function_one},
-      ...>       myfield2: {MyRedacterModule, :redact_function_two},
+      ...>       myfield1: {MyRedactorModule, :redact_function_one},
+      ...>       myfield2: {MyRedactorModule, :redact_function_two},
       ...>     ]}
       ...>   defstruct [:myfield1, :myfield2]
       ...> end
