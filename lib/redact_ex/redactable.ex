@@ -54,7 +54,17 @@ defprotocol RedactEx.Redactable do
   e.g. suppose you define a module like
 
   ```
-  #{File.read!("./test/support/derive/redact_struct.ex")}
+  # ./test/support/derive/redact_struct.ex
+  defmodule MyApp.RedactStruct do
+    @moduledoc false
+
+    # For usage in RedactEx.Redactable doctests
+    @derive {RedactEx.Redactable,
+            fields: [
+              myfield: {String, :reverse}
+            ]}
+    defstruct [:myfield]
+  end
   ```
 
   then you can expect it to have derived the `RedactEx.Redactable` protocol

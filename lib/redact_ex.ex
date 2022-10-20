@@ -1,6 +1,6 @@
 defmodule RedactEx do
   @moduledoc """
-  RedactEx provides protocols and derivatoin utilities to work with
+  RedactEx provides protocols and derivation utilities to work with
   sensitive data that should be redacted in logs and external facing tools
 
   * `RedactEx.Redactor` module gives you automagical generation of redacting
