@@ -71,7 +71,20 @@ defmodule RedactEx do
   No strategy can eliminate the risk of leaking sensitive data with code only.
 
   Our suggested approach is to derive also the [inspect](https://hexdocs.pm/elixir/1.14.0/Inspect.html) protocol
-  and use it for your struct whenever you log or send data to external systems.
+  and use it for your struct whenever you log or send data to external systems, e.g.
+
+      iex> defimpl Inspect,
+      ...>   for: MyApp.OtherRedactStruct do
+      ...>   alias MyApp.OtherRedactStruct
+      ...>   alias RedactEx.Redactable
+      ...>
+      ...>   @spec inspect(OtherRedactStruct.t(), Inspect.Opts.t()) :: Inspect.Algebra.t()
+      ...>   def inspect(input, opts) do
+      ...>     input
+      ...>     |> Redactable.redact()
+      ...>     |> Inspect.Any.inspect(opts)
+      ...>   end
+      ...> end
 
   Another strategy could be to directly call `RedactEx.Redactable.redact/1` on structs when logging, but using
   `inspect` seems to us more natural and idiomatic.
