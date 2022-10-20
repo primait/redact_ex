@@ -76,7 +76,7 @@ defmodule RedactEx do
   Another strategy could be to directly call `RedactEx.Redactable.redact/1` on structs when logging, but using
   `inspect` seems to us more natural and idiomatic.
 
-  Another strategy could be to `redact` your data directly in a custom Logger backend, or whatever the system
+  Another strategy could be to `redact`/`inspect` your data directly in a custom Logger backend, or whatever the system
   used for exporting potentially sensitive data.
   """
 end
