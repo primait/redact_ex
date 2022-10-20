@@ -175,8 +175,16 @@ defimpl RedactEx.Redactable, for: Any do
       {_, {redactor_module, redactor_function}} ->
         Code.ensure_loaded!(redactor_module)
         # true = Module.defines?(redactor_module, {redactor_function, 1})
-        true = Kernel.function_exported?(redactor_module, redactor_function, 1)
+        function_exported!(redactor_module, redactor_function, 1)
     end)
+  end
+
+  defp function_exported!(module, function, arity) do
+    if Kernel.function_exported?(module, function, arity) == true do
+      :ok
+    else
+      raise "Module [#{inspect(module)}] does not implement [#{inspect(function)}/#{inspect(arity)}]"
+    end
   end
 
   # redact all fields
