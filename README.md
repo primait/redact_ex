@@ -1,4 +1,4 @@
-[![CI status](https://drone-1.prima.it/api/badges/primait/redact_ex/status.svg?branch=master)](https://drone-1.prima.it/primait/redact_ex) [![Test Coverage](https://github.com/primait/redact_ex/workflows/Test%20Coverage/badge.svg)](https://github.com/primait/redact_ex/actions?query=workflow%3A%22Test+Coverage%22)
+[![CI status](https://drone-1.prima.it/api/badges/primait/redact_ex/status.svg?branch=master)](https://drone-1.prima.it/primait/redact_ex) [![Hex Docs](https://img.shields.io/badge/hex.pm-docs-brightgreen)](https://hexdocs.pm/redact_ex)
 
 # redact_ex
 
@@ -15,6 +15,8 @@ to  your understanding of the system, and at the same moment it does not expose 
 ## Configuration
 
 ## Usage
+
+Full documentation is available on [hexdocs](https://hexdocs.pm/redact_ex)
 
 See [RedactEx](./lib/redact_ex.ex) for general information about this library and its intended use
 See [RedactEx.Redactor](./lib/redact_ex/redactor.ex) for generating fast redactors for strings
@@ -40,7 +42,8 @@ cp .tool-versions.recommended .tool-versions
 
 ## Open Points
 
-   * Other ways of redacting (e.g. first X letters and last Y exposed)
-   * maybe-email redactor (with fallback)?
+   * Other ways of redacting (e.g. first X letters and last Y exposed, random redactors, ecc)
+   * maybe-email redactor
    * define a default strict implementation for `redact` in the `Any` implementation?
    * some other default magic configuration in derive, e.g. a default module+function?
+   * better handling of fallbacks for derived structs, and macro-generated helpers to "try_redact" structs that may be nil or other
