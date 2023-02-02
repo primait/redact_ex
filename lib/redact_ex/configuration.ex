@@ -139,7 +139,7 @@ defmodule RedactEx.Configuration do
         lengths
 
       # range case
-      {:.., [line: _], [min, max]} ->
+      {:.., _context, [min, max]} ->
         Enum.map(min..max, & &1)
 
       other ->

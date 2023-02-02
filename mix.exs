@@ -4,7 +4,7 @@ defmodule RedactEx.MixProject do
   def project do
     [
       app: :redact_ex,
-      version: "0.1.5",
+      version: "0.1.6",
       source_url: "https://github.com/primait/redact_ex",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
