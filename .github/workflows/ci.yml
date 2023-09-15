@@ -57,21 +57,28 @@ jobs:
       # Get dependencies
       - name: Deps get
         run: mix deps.get
+      - name: Dependencies Check
+        run: mix deps.unlock --check-unused
       # Experimental: compile without warnings (throw it away if macro magic creates problems)
       - name: Compiles without warnings
         run: mix compile --warnings-as-errors
       # Check Format
       - name: Check Formatting
         run: mix format --check-formatted
+      - name: Credo
+        run: mix credo -a --strict
       - name: Test
         run: mix test
+      - name: Dialyzer
+        run: mix dialyzer
          
   alls-green:
     if: always()
           
     needs:
       - redact_ex
-    runs-on: [self-hosted, k8s-small]
+    # runs-on: [self-hosted, k8s-small]
+    runs-on: ubuntu-latest
     container:
       image: public.ecr.aws/prima/python:3.9.10-3
     steps:
