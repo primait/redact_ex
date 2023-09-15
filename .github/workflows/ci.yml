@@ -10,7 +10,8 @@ on:
 
 jobs:
   redact_ex:
-    runs-on: [self-hosted, k8s-medium]
+    # runs-on: [self-hosted, k8s-medium]
+    runs-on: ubuntu-latest
     env:
       MIX_ENV: test
     strategy:
