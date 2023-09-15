@@ -9,80 +9,72 @@ on:
       - master
 
 jobs:
-    elixir:
-      uses: primait/shared-github-actions/.github/workflows/elixir-ci.yml@elixir-ci-v2
-      with:
-        elixir-version: "1.13.4-otp-25"
-        otp-version: "25.3"
-        enable-tests: false
-
-    redact_ex:
-      runs-on: [self-hosted, k8s-medium]
-      env:
-        MIX_ENV: test
-      strategy:
-        # Specify the OTP and Elixir versions to use when building
-        # and running the workflow steps.
-        matrix:
-          otp: ['25.0.4']       # Define the OTP version [required]
-          elixir: ['1.14.3']    # Define the elixir version [required]
-      steps:
-        # Check out the code.
-        - name: Checkout
-          uses: actions/checkout@v3
-        # Define how to cache deps. Restores existing cache if present.
-        - name: Cache deps
-          id: cache-deps
-          uses: actions/cache@v3
-          env:
-            cache-name: cache-elixir-deps
+  redact_ex:
+    runs-on: [self-hosted, k8s-medium]
+    env:
+      MIX_ENV: test
+    strategy:
+      # Specify the OTP and Elixir versions to use when building
+      # and running the workflow steps.
+      matrix:
+        otp: ['25.0.4']       # Define the OTP version [required]
+        elixir: ['1.14.3']    # Define the elixir version [required]
+    steps:
+      # Check out the code.
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Define how to cache deps. Restores existing cache if present.
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-deps
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      # Define how to cache the `_build` directory. After the first run,
+      # this speeds up tests runs a lot. This includes not re-compiling our
+      # project's downloaded deps every run.
+      - name: Cache compiled build
+        id: cache-build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-compiled-build
+        with:
+          path: _build
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+            ${{ runner.os }}-mix-
+      # Get dependencies
+      - name: Deps get
+        run: mix deps.get
+      # Experimental: compile without warnings (throw it away if macro magic creates problems)
+      - name: Compiles without warnings
+        run: mix compile --warnings-as-errors
+      # Check Format
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Test
+        run: mix test
+         
+  alls-green:
+    if: always()
+          
+    needs:
+      - redact_ex
+    runs-on: [self-hosted, k8s-small]
+    container:
+      image: public.ecr.aws/prima/python:3.9.10-3
+    steps:
+        - name: Decide whether the needed jobs succeeded or failed
+          uses: re-actors/alls-green@release/v1
           with:
-            path: deps
-            key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-mix-${{ env.cache-name }}-
-        - name: Setup Elixir
-          uses: erlef/setup-beam@v1
-          with:
-            otp-version: ${{matrix.otp}}
-            elixir-version: ${{matrix.elixir}}
-        # Define how to cache the `_build` directory. After the first run,
-        # this speeds up tests runs a lot. This includes not re-compiling our
-        # project's downloaded deps every run.
-        - name: Cache compiled build
-          id: cache-build
-          uses: actions/cache@v3
-          env:
-            cache-name: cache-compiled-build
-          with:
-            path: _build
-            key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-mix-${{ env.cache-name }}-
-              ${{ runner.os }}-mix-
-        # Get dependencies
-        - name: Deps get
-          run: mix deps.get
-        # Experimental: compile without warnings (throw it away if macro magic creates problems)
-        - name: Compiles without warnings
-          run: mix compile --warnings-as-errors
-        # Check Format
-        - name: Check Formatting
-          run: mix format --check-formatted
-        - name: Test
-          run: mix test
-           
-    alls-green:
-      if: always()
-            
-      needs:
-        - redact_ex
-        - elixir
-      runs-on: [self-hosted, k8s-small]
-      container:
-        image: public.ecr.aws/prima/python:3.9.10-3
-      steps:
-          - name: Decide whether the needed jobs succeeded or failed
-            uses: re-actors/alls-green@release/v1
-            with:
-              jobs: ${{ toJSON(needs) }}
+            jobs: ${{ toJSON(needs) }}
