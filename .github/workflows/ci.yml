@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+    strategy:
+      # Specify the OTP and Elixir versions to use when building
+      # and running the workflow steps.
+      matrix:
+        otp: ['25.0.4']       # Define the OTP version [required]
+        elixir: ['1.14.3']    # Define the elixir version [required]
+    steps:
+      # Check out the code.
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Define how to cache deps. Restores existing cache if present.
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-deps
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      # Define how to cache the `_build` directory. After the first run,
+      # this speeds up tests runs a lot. This includes not re-compiling our
+      # project's downloaded deps every run.
+      - name: Cache compiled build
+        id: cache-build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-compiled-build
+        with:
+          path: _build
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+            ${{ runner.os }}-mix-
+      # Conditionally bust the cache when job is re-run.
+      # Sometimes, we may have issues with incremental builds that are fixed by
+      # doing a full recompile. In order to not waste dev time on such trivial
+      # issues (while also reaping the time savings of incremental builds for
+      # *most* day-to-day development), force a full recompile only on builds
+      # that are retried.
+      # https://fly.io/docs/elixir/advanced-guides/github-actions-elixir-ci-cd/
+      - name: Clean to rule out incremental build as a source of flakiness
+        if: github.run_attempt != '1'
+        run: |
+          mix deps.clean --all
+          mix clean
+      # Get dependencies
+      - name: Deps get
+        run: mix deps.get
+      - name: Dependencies Check
+        run: mix deps.unlock --check-unused
+      # Experimental: compile without warnings (throw it away if macro magic creates problems)
+      - name: Compiles without warnings
+        run: mix compile --warnings-as-errors
+      # Check Format
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Credo
+        run: mix credo -a --strict
+      - name: Test
+        run: mix test
+      - name: Dialyzer
+        run: mix dialyzer
+
+  alls-green:
+    if: always()
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/prima/python:3.9.10-3
+    steps:
+        - name: Decide whether the needed jobs succeeded or failed
+          uses: re-actors/alls-green@release/v1
+          with:
+            jobs: ${{ toJSON(needs) }}
