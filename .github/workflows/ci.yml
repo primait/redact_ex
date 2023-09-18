@@ -53,6 +53,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.cache-name }}-
             ${{ runner.os }}-mix-
+      # Conditionally bust the cache when job is re-run.
+      # Sometimes, we may have issues with incremental builds that are fixed by
+      # doing a full recompile. In order to not waste dev time on such trivial
+      # issues (while also reaping the time savings of incremental builds for
+      # *most* day-to-day development), force a full recompile only on builds
+      # that are retried.
+      # https://fly.io/docs/elixir/advanced-guides/github-actions-elixir-ci-cd/
+      - name: Clean to rule out incremental build as a source of flakiness
+        if: github.run_attempt != '1'
+        run: |
+          mix deps.clean --all
+          mix clean
       # Get dependencies
       - name: Deps get
         run: mix deps.get
