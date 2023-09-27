@@ -88,8 +88,6 @@ jobs:
     needs:
       - test
     runs-on: ubuntu-latest
-    container:
-      image: public.ecr.aws/prima/python:3.9.10-3
     steps:
         - name: Decide whether the needed jobs succeeded or failed
           uses: re-actors/alls-green@release/v1
