@@ -84,12 +84,10 @@ jobs:
         run: mix dialyzer
 
   alls-green:
-    if: always()
+    if: ${{ !cancelled() }}
     needs:
       - test
-    runs-on: ubuntu-latest
+    runs-on: [k8s-small]
     steps:
-        - name: Decide whether the needed jobs succeeded or failed
-          uses: re-actors/alls-green@release/v1
-          with:
-            jobs: ${{ toJSON(needs) }}
+      - name: Decide whether the needed jobs succeeded or failed
+        run: ${{ !contains(needs.*.result, 'failure') }}
