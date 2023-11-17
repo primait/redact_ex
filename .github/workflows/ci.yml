@@ -87,7 +87,7 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - test
-    runs-on: [k8s-small]
+    runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         run: ${{ !contains(needs.*.result, 'failure') }}
