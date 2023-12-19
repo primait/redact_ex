@@ -23,12 +23,12 @@ jobs:
         run: mix deps.get
       - name: get tag
         run: |
-          REDACT_EX_VERSION_REPO=$(grep -m1 version mix.exs | cut -d'"' -f2)
-          echo "REDACT_EX_VERSION_REPO=$REDACT_EX_VERSION_REPO" >> $GITHUB_ENV
-      - name: check tags
-        if: github.ref_tag != ${{ env.REDACT_EX_VERSION_REPO }}
+          VERSION=$(grep -m1 version mix.exs | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: check version
+        if: ${{ github.event.release.tag_name != env.VERSION }}
         run: |
-          echo "Github ref tag [${{ github.ref_tag }}] is different from mix.exs version [${{ env.REDACT_EX_VERSION_REPO }}]"
+          echo "Github ref tag [${{ github.event.release.tag_name }}] is different from mix.exs version [${{ env.VERSION }}]"
           exit 1
       - name: Login to hex.pm
         run: |
