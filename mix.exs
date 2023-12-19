@@ -1,11 +1,14 @@
 defmodule RedactEx.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/primait/redact_ex"
+  @version "0.1.6-rc.0"
+
   def project do
     [
       app: :redact_ex,
-      version: "0.1.6",
-      source_url: "https://github.com/primait/redact_ex",
+      version: @version,
+      source_url: @source_url,
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
@@ -26,8 +29,8 @@ defmodule RedactEx.MixProject do
       ],
       # Docs
       name: "RedactEx",
-      source_url: "https://github.com/primait/redact_ex",
-      homepage_url: "https://github.com/primait/redact_ex",
+      source_url: @source_url,
+      homepage_url: @source_url,
       docs: docs(),
       package: package()
     ]
