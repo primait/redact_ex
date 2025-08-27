@@ -28,11 +28,12 @@ defmodule RedactEx.Algorithms.Center do
         head_size = ceil(keep_size)
         tail_size = floor(keep_size)
         center_size = max(string_length - head_size - tail_size, 0)
-        center_content = for _ <- 1..center_size, do: unquote(redactor), into: ""
 
         if center_size <= 0 do
           unquote(redactor)
         else
+          center_content = for _ <- 1..center_size, do: unquote(redactor), into: ""
+
           String.slice(value, 0..(head_size - 1)) <>
             center_content <> String.slice(value, (string_length - tail_size)..string_length)
         end
