@@ -2,7 +2,7 @@ defmodule RedactEx.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/primait/redact_ex"
-  @version "0.1.6-rc.0"
+  @version "0.1.8"
 
   def project do
     [
