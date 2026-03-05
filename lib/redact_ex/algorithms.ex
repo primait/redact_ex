@@ -48,6 +48,6 @@ defmodule RedactEx.Algorithms do
   defp manage_error(algorithm_module, {:implements, _}),
     do:
       raise(
-        raise "Module [#{inspect(algorithm_module)}] does not implements the #{__MODULE__} behaviour"
+        "Module [#{inspect(algorithm_module)}] does not implements the #{__MODULE__} behaviour"
       )
 end
