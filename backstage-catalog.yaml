@@ -1,8 +1,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: redact_ex
+  name: "redact_ex"
+  description: "Utilities to redact sensitive data in Elixir projects"
 spec:
-  type: service
+  type: "library"
   lifecycle: production
-  owner: "owner-placeholder"
+  owner: "group:default/team-developer-experience"
+  system: prima.it
