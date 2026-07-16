@@ -6,5 +6,5 @@ metadata:
 spec:
   type: "library"
   lifecycle: production
-  owner: "group:default/team-developer-experience"
+  owner: "group:default/team-iam"
   system: prima.it
